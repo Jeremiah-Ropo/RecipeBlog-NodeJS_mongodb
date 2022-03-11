@@ -1,1 +1,1 @@
-# RecipeBlog NodeJS using mongodb (CURD)
+# RecipeBlog NodeJS using mongodb (CreateUpdateReadDelete)
