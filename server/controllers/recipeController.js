@@ -1,4 +1,5 @@
 require('../models/database');
+const { request } = require('express');
 const Category = require('../models/Category.js')
 const Recipe = require('../models/Recipe.js');
 //Get homepage
@@ -7,13 +8,22 @@ exports.homepage = async(req, res) => {
     try {
         const limitView = 5
         const categories = await Category.find({}).limit(limitView)
-        const recipes = await Recipe.find({}).sort({_id:-1}).limit(limitView);
-        res.render('home', { title: 'Cooking Blog - Homepage' , categories, recipes});
+        const latest = await Recipe.find({}).sort({_id:-1}).limit(limitView);
+        const thai = await Recipe.find({ 'category' : 'thai'}).limit(limitView);
+        const american = await Recipe.find({ 'category' : 'american'}).limit(limitView);
+        const mexican = await Recipe.find({ 'category' : 'mexican'}).limit(limitView);
+
+        const food = await { latest, american, mexican, thai }
+
+        res.render('home', { title: 'Cooking Blog - Homepage' , categories, food});
     }catch (error) {
         res.status(500).send({message: error.message || 'Error Occured'})
     }
     
 }
+
+//Categories controller
+
 exports.exploreCategories = async(req, res) => {
     try {
         const categories = await Category.find({})
@@ -23,6 +33,42 @@ exports.exploreCategories = async(req, res) => {
     }
 }
 
+//Categories by Id
+
+exports.exploreCategoryById = async(req, res) => {
+
+    try {
+        let categoryId = req.params.id;
+        const unique = await Category.findOne({name: categoryId});
+        let categories = categoryId.toLowerCase()
+        const recipe = await Recipe.findOne({category:categories})
+        res.render('recipes', { title: 'Cooking Blog - Categories' , recipe}); 
+    }catch (error) {
+        res.status(500).send({message: error.message || 'Error Occured'})
+    }
+}
+
+//Recipes controller. /recipe/:id
+exports.exploreRecipes = async(req, res) => {
+    try {
+        const requestId = req.params.id
+        const recipe = await Recipe.findById({'_id': requestId})
+        res.render('recipes', { title: 'Cooking Blog - Recipes' , recipe});
+    }catch (error) {
+        res.status(500).send({message: error.message || 'Error Occured'})
+    }
+}
+
+//Latest recipe page.
+exports.exploreLatest = async(req, res) => {
+    try {
+        const limitView = 20
+        const latestRecipe = await Recipe.find({}).sort({'_id': '-1'}).limit(limitView)
+        res.render('explore-latest', { title: 'Cooking Blog - Recipes' , latestRecipe});
+    }catch (error) {
+        res.status(500).send({message: error.message || 'Error Occured'})
+    }
+}
 
 
 
