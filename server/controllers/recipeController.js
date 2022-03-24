@@ -84,10 +84,30 @@ exports.exploreSearch = async(req, res) => {
 }
 
 
+//Random recipe controller.
+exports.exploreRandom = async(req, res) => {
+    try {
+        const count = await Recipe.find().countDocuments();
+        const random = Math.floor(Math.random() * count);
+        const recipe = await Recipe.findOne().skip(random).exec();
 
+        res.render('showRand', { title: 'Cooking Blog - Random Recipe' , recipe});
+    } catch (error) {
+        res.status(500).send({message: error.message || 'Error Occured'})
+    }
+}
 
+//Submit page controller.
 
+exports.submitRecipe = async(req, res) => {
+    try {
 
+        res.render('submit', {title: 'Cooking Blog - Submit-Recipe'})
+
+    } catch (error){
+        res.status(500).send({message: error.message || 'Error Occured'})
+    }
+}
 
 
 

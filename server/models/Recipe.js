@@ -11,7 +11,7 @@ const recipeSchema = mongoose.Schema({
     },
     category:{
         type: String,
-        enum: ['chinese','american', 'mexican', 'indian', 'thai', 'spanish'],
+        enum: ['chinese','american', 'mexican', 'indian', 'thai', 'spanish', 'nigerian'],
         required: 'The field is required'
     },
     email:{
