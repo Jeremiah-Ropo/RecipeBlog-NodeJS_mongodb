@@ -39,10 +39,9 @@ exports.exploreCategoryById = async(req, res) => {
 
     try {
         let categoryId = req.params.id;
-        const unique = await Category.findOne({name: categoryId});
         let categories = categoryId.toLowerCase()
-        const recipe = await Recipe.findOne({category:categories})
-        res.render('recipes', { title: 'Cooking Blog - Categories' , recipe}); 
+        const category = await Recipe.find({category:categories})
+        res.render('categories', { title: 'Cooking Blog - Categories' , category}); 
     }catch (error) {
         res.status(500).send({message: error.message || 'Error Occured'})
     }
