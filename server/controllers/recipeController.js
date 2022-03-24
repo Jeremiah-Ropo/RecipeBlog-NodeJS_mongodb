@@ -26,7 +26,8 @@ exports.homepage = async(req, res) => {
 
 exports.exploreCategories = async(req, res) => {
     try {
-        const categories = await Category.find({})
+        const limitView = 20
+        const categories = await Category.find({}).limit(limitView)
         res.render('categories', { title: 'Cooking Blog - Categories' , categories});
     }catch (error) {
         res.status(500).send({message: error.message || 'Error Occured'})
@@ -34,13 +35,12 @@ exports.exploreCategories = async(req, res) => {
 }
 
 //Categories by Id
-
 exports.exploreCategoryById = async(req, res) => {
 
     try {
-        let categoryId = req.params.id;
-        let categories = categoryId.toLowerCase()
-        const category = await Recipe.find({category:categories})
+        let categoryById = req.params.id;
+        let categoryId = categoryById.toLowerCase()
+        const category = await Recipe.find({category:categoryId})
         res.render('categories', { title: 'Cooking Blog - Categories' , category}); 
     }catch (error) {
         res.status(500).send({message: error.message || 'Error Occured'})
@@ -69,7 +69,19 @@ exports.exploreLatest = async(req, res) => {
     }
 }
 
+// Search page.
 
+exports.exploreSearch = async(req, res) => {
+    try {
+        const searchTerm = req.body.searchTerm;
+
+        const limitView = 20;
+        const recipes = await Recipe.find({ $text: {$search:searchTerm, $diacriticSensitive:true}}).limit(limitView)
+        res.render('search', { title: 'Cooking Blog - Search' , recipes});
+    }catch (error) {
+        res.status(500).send({message: error.message || 'Error Occured'})
+    }
+}
 
 
 

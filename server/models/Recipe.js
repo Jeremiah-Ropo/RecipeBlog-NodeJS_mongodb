@@ -28,5 +28,8 @@ const recipeSchema = mongoose.Schema({
     },
 })
 
+recipeSchema.index({ name: 'text', description: 'text', category: 'text'});
+// Wildcart indexing
+// recipeSchema.index({'$**': 'text'});
 
 module.exports = mongoose.model('Recipe', recipeSchema);
