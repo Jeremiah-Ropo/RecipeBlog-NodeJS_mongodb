@@ -99,17 +99,60 @@ exports.exploreRandom = async(req, res) => {
 
 //Submit page controller.
 
+//Get from the database
 exports.submitRecipe = async(req, res) => {
     try {
 
-        res.render('submit', {title: 'Cooking Blog - Submit-Recipe'})
+        const infoFailObj = req.flash('infofail');
+        const infoSubmitObj = req.flash('infoSubmit');
 
+        res.render('submit', {title: 'Cooking Blog - Submit-Recipe', infoFailObj, infoSubmitObj})
     } catch (error){
         res.status(500).send({message: error.message || 'Error Occured'})
     }
-}
+};
 
 
+//Post to the database.
+exports.submitRecipePost = async(req, res) => {
+    try {
+
+        let imageUploadFile;
+        let uploadPath;
+        let newImageName;
+
+        if(!req.files || Object.keys(req.files).length === 0){
+            return res.status(400).send('No files were uploaded.')
+        } else {
+            imageUploadFile = req.files.image;
+            newImageName = Date.now() + imageUploadFile.name;
+    
+            uploadPath = require('path').resolve('./') + '/public/uploads/' + newImageName;
+    
+            imageUploadFile.mv(uploadPath, (err) => {
+                if (err){
+                    return res.status(500).send(err);
+                }
+            })            
+        }
+        const newRecipe = new Recipe({
+            name: req.body.name,
+            description: req.body.description,
+            ingredients: req.body.ingredients,
+            category: req.body.category,
+            email: req.body.email,
+            image: newImageName
+        })
+
+        await newRecipe.save();
+
+        req.flash('infosubmit', 'Recipe has been added')
+        res.redirect('/submit-recipe')
+    } catch (error){
+        req.flash('infofail', 'Oops, something has gone wrong')
+        res.redirect('/submit-recipe');
+    }
+};
 
 
 
