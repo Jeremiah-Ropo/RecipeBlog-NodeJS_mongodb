@@ -1,2 +1,2 @@
 # RecipeBlog NodeJS using mongodb (CreateUpdateReadDelete)
-trying to include an authentication feature.
+This is a recipeblog web app
