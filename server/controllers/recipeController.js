@@ -2,6 +2,7 @@ require('../models/database');
 const { request } = require('express');
 const Category = require('../models/Category.js')
 const Recipe = require('../models/Recipe.js');
+const User = require('../models/User.js');
 //Get homepage
 //Controller is more of where all router can be controlled.
 exports.homepage = async(req, res) => {
@@ -12,6 +13,7 @@ exports.homepage = async(req, res) => {
         const thai = await Recipe.find({ 'category' : 'thai'}).limit(limitView);
         const american = await Recipe.find({ 'category' : 'american'}).limit(limitView);
         const mexican = await Recipe.find({ 'category' : 'mexican'}).limit(limitView);
+
 
         const food = await { latest, american, mexican, thai }
 
@@ -31,6 +33,68 @@ exports.exploreCategories = async(req, res) => {
         res.render('categories', { title: 'Cooking Blog - Categories' , categories});
     }catch (error) {
         res.status(500).send({message: error.message || 'Error Occured'})
+    }
+}
+
+exports.submitRegister = async(req, res) => {
+    try {
+
+        const infoFailObj = req.flash('infofail');
+        const infoSubmitObj = req.flash('infoSubmit');
+
+        res.render('register', {title: 'Cooking Blog - Sign Up', infoFailObj, infoSubmitObj})
+    } catch (error){
+        res.status(500).send({message: error || 'Error Occured'})
+    }
+};
+
+exports.submitLogin = async(req, res) => {
+    try {
+
+        const infoFailObj = req.flash('infofail');
+        const infoSubmitObj = req.flash('infoSubmit');
+
+        res.render('login', {title: 'Cooking Blog - Sign In', infoFailObj, infoSubmitObj})
+    } catch (error){
+        res.status(500).send({message: error || 'Error Occured'})
+    }
+};
+
+exports.register = async(req, res) => {
+    try {
+        const user = await User.findOne({email: req.email});
+        if(user){
+            return res.status(400).send({message: "Email already registered"})
+        }
+        const newUser = new User({
+            email: req.body.email,
+            username: req.body.username,
+            password: req.body.password,
+        })
+
+        await newUser.save();
+        req.flash('infosubmit', 'Registered Successfully')
+        res.redirect('/submit-recipe');
+    }catch (error) {
+        req.flash('infofail', 'Oops, something went wrong')
+        res.redirect('/')
+    }
+}
+
+exports.login = async(req, res) => {
+    try {
+        const user = await User.findOne({email: req.body.email});
+        if(!user){
+            return res.status(400).send({message: "User not found"})
+        }
+        if(user.password != req.body.password){
+            return res.status(400).send('Incorrect password')
+        }
+        req.flash('infosubmit', 'Login Successfully')
+        res.redirect('/submit-recipe');
+    }catch (error) {
+        req.flash('infofail', 'Oops, something went wrong')
+        res.redirect('/')
     }
 }
 
@@ -147,7 +211,7 @@ exports.submitRecipePost = async(req, res) => {
         await newRecipe.save();
 
         req.flash('infosubmit', 'Recipe has been added')
-        res.redirect('/submit-recipe')
+        res.redirect('/')
     } catch (error){
         req.flash('infofail', 'Oops, something has gone wrong')
         res.redirect('/submit-recipe');

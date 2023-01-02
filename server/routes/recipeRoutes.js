@@ -14,6 +14,13 @@ router.get('/explore-random', recipeController.exploreRandom);
 router.get('/submit-recipe', recipeController.submitRecipe);
 router.post('/submit-recipe', recipeController.submitRecipePost);
 
+router.post('/register', recipeController.register);
+router.get('/register', recipeController.submitRegister);
+
+router.post('/login', recipeController.login);
+router.get('/signin', recipeController.submitLogin);
+
+
 
 
 module.exports = router;
